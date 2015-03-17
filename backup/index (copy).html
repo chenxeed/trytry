@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="d3.js"></script>
+	<style type="text/css">
+		body {
+			margin: 0; padding: 0;
+		}
+		.wrapper {
+			position: relative;
+			box-shadow: 0 0 10px black;
+			margin: 10px;
+		}
+		.wrapper.circle {
+			float: left;
+		}
+		.wrapper.input {
+			float: left;
+			padding: 20px;
+		}
+	</style>
+</head>
+<body>
+	<h1>How d3.js dynamically update element based on data</h1>
+	
+	<script type="text/javascript">
+
+		// append div.wrapper into body
+		var body = d3.select("body");
+		var circle_wrapper = body.append("div");
+		circle_wrapper.style("border","black solid 1px")
+		.style("width","500px")
+		.style("height","500px");
+		circle_wrapper.classed("wrapper circle", true);
+
+		// circle data
+		var data_circle = [
+			{r:20, x:30, y:50, c:"green"},
+			{r:50, x:230, y:50, c:"red"},
+			{r:25, x:30, y:250, c:"blue"},
+			{r:70, x:230, y:300, c:"yellow"},
+		];
+		
+		// append the svg
+		var svg = circle_wrapper.append("svg")
+		.attr("width","400")
+		.attr("height","400")
+		;
+
+		var circle;
+		circle = svg.selectAll("circle").data(data_circle);
+		circle.enter().append("circle");
+		
+		// function to update circle
+		function updateCircle(){
+			circle = svg.selectAll("circle").data(data_circle);
+			// want animation effect? just put transition() to give transition effect when value changes
+			circle.transition().attr("r", function(d){ console.log('update R'); return d.r; })
+			.attr("cx", function(d){ console.log('update X'); return d.x; })
+			.attr("cy", function(d){ console.log('update Y'); return d.y; })
+			.style("fill", function(d){ return d.c; });
+		}
+
+		// update circle
+		updateCircle();
+
+		// set input
+		input_wrapper = body.append("div");
+		var inputs = input_wrapper.classed("wrapper input", true).text("Circle Data Here").selectAll("div").data(data_circle).enter().append("p");
+
+		// create input based on data and its parameter
+		var input = inputs.append("div").text("R: ").append("input").attr("type","number").attr("value", function(d){ return d.r; } )
+		.on("input", function(d){ d.r = parseInt(this.value); })
+		;
+		var input = inputs.append("div").text("X: ").append("input").attr("type","number").attr("value", function(d){ return d.x; } )
+		.on("input", function(d){ d.x = parseInt(this.value); })
+		;
+		var input = inputs.append("div").text("Y: ").append("input").attr("type","number").attr("value", function(d){ return d.y; } )
+		.on("input", function(d){ d.y = parseInt(this.value); })
+		;
+		var input = inputs.append("div").text("Fill: ").append("input").attr("type","text").attr("value", function(d){ return d.c; } )
+		.on("input", function(d){ d.c = this.value; })
+		;
+
+		// add event listener on change input
+		d3.selectAll("input").on("input.updateCircle", function(){ console.log('update Circle!'); updateCircle(); }, false );
+
+	</script>
+</body>
+</html>
