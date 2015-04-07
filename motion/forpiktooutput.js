@@ -56,6 +56,8 @@
 		var whiteArea;
 		var moveTo = null;
 		var moveOk = false;
+		var fromX = 0;
+		var rangeX = 0;
 
 		// every ?th of a second, sample the video stream
 		window.webcamSwiperInterval = setInterval(analyzeCurrentFrame, 1000/28);
@@ -95,19 +97,22 @@
 		function checkMove(){
 			var x = whiteArea[0][0];
 			if(x==0){
+				fromX = 0;
+				rangeX = 0;
 				moveTo = null;
 				moveOk = false;
 			}else{
-				if(moveTo==null){
-					if(x < 60){
-						moveTo = 'right';
-					}else if(x > 200){
-						moveTo = 'left';
-					}
-				}
+				// initialize start of x
+				fromX = fromX || x;
+				rangeX = x - fromX;
 			}
 			if( !moveOk ){
-				if( (moveTo=='right' && x > 200) || (moveTo=='left' && x < 60) ){
+				if( Math.abs(rangeX) > 60 ){
+					if(rangeX > 0){
+						moveTo = 'right';
+					}else{
+						moveTo = 'left';
+					}
 					doMovement(moveTo);
 					moveOk = true;
 				}
